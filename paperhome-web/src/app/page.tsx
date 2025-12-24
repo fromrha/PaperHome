@@ -281,16 +281,16 @@ export default function Home() {
                     {activeTab === 'national' ? <MapPin size={24} /> : <Globe size={24} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-800 truncate pr-4" title={journal.name}>{journal.name}</h4>
-                        <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
-                          <span>{journal.publisher}</span>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                          <span className="font-mono bg-slate-100 px-1.5 rounded">{journal.issn}</span>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-bold text-slate-800 break-words leading-tight" title={journal.name}>{journal.name}</h4>
+                        <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-500">
+                          <span className="break-words">{journal.publisher}</span>
+                          <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
+                          <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs">{journal.issn}</span>
                         </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
                         journal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
                           'bg-slate-100 text-slate-600'
                         }`}>
@@ -298,10 +298,10 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       {(Array.isArray(journal.specific_focus) ? journal.specific_focus : [journal.specific_focus]).map((tag: string | unknown, i: number) => (
                         typeof tag === 'string' && (
-                          <span key={i} className="px-2.5 py-1 bg-slate-50 text-slate-600 text-xs rounded-md border border-slate-100 truncate max-w-[200px]">
+                          <span key={i} className="px-2.5 py-1 bg-slate-50 text-slate-600 text-xs rounded-md border border-slate-100 break-words max-w-full">
                             {tag}
                           </span>
                         )

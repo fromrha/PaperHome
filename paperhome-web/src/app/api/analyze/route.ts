@@ -24,14 +24,20 @@ export async function POST(req: NextRequest) {
             try {
                 // Dynamic import to handle bundling issues
                 const pdfModule = await import('pdf-parse');
-                // Handle various import scenarios (ESM vs CJS default export)
-                const pdf = (pdfModule as any).default || pdfModule;
+                // The module exports PDFParse as a class constructor
+                const PDFParseClass = (pdfModule as any).PDFParse;
 
-                if (typeof pdf !== 'function') {
-                    throw new Error(`pdf-parse library is not a function. It is: ${typeof pdf}`);
+                if (!PDFParseClass) {
+                    throw new Error('PDFParse class not found in pdf-parse module');
                 }
 
-                const data = await pdf(buffer);
+                // Instantiate the parser with options and parse the buffer
+                const options = {
+                    verbosity: 0, // Suppress warnings/logs
+                    max: 0 // Parse all pages (0 = no limit)
+                };
+                const parser = new PDFParseClass(options);
+                const data = await parser.parse(buffer);
                 textForAnalysis = data.text;
             } catch (e: any) {
                 console.error('PDF Parse Error:', e);
@@ -64,7 +70,6 @@ export async function POST(req: NextRequest) {
         // 30k chars is usually safe for a paper abstract + intro
         const truncatedText = textForAnalysis.slice(0, 30000);
 
-        // Reverting to gemini-1.5-flash as gemini-2.5-flash is not a valid model ID yet.
         const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
         const prompt = `
