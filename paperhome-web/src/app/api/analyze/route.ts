@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+
 export const runtime = 'nodejs';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -21,8 +22,15 @@ export async function POST(req: NextRequest) {
 
         if (file.type === 'application/pdf') {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const pdf = require('pdf-parse');
+                // Dynamic import to handle bundling issues
+                const pdfModule = await import('pdf-parse');
+                // Handle various import scenarios (ESM vs CJS default export)
+                const pdf = (pdfModule as any).default || pdfModule;
+
+                if (typeof pdf !== 'function') {
+                    throw new Error(`pdf-parse library is not a function. It is: ${typeof pdf}`);
+                }
+
                 const data = await pdf(buffer);
                 textForAnalysis = data.text;
             } catch (e: any) {
@@ -36,8 +44,8 @@ export async function POST(req: NextRequest) {
             file.name.endsWith('.doc')
         ) {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const mammoth = require('mammoth');
+                // Dynamic import for mammoth
+                const mammoth = await import('mammoth');
                 const result = await mammoth.extractRawText({ buffer: buffer });
                 textForAnalysis = result.value;
                 if (result.messages.length > 0) {
@@ -56,7 +64,8 @@ export async function POST(req: NextRequest) {
         // 30k chars is usually safe for a paper abstract + intro
         const truncatedText = textForAnalysis.slice(0, 30000);
 
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Reverting to gemini-1.5-flash as gemini-2.5-flash is not a valid model ID yet.
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
         const prompt = `
       Analyze the following academic paper text and extract:
