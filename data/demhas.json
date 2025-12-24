@@ -1,0 +1,522 @@
+[
+  {
+    "name": "Acta Medica Indonesiana",
+    "rank": "SINTA 1",
+    "issn": "2338-2732 (Online)",
+    "publisher": "The Indonesian Society of Internal Medicine",
+    "broad_field": "Health Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://actamedindones.org/](https://actamedindones.org/)"
+  },
+  {
+    "name": "Telkomnika (Telecommunication Computing Electronics and Control)",
+    "rank": "SINTA 1",
+    "issn": "2302-9293 (Online)",
+    "publisher": "Universitas Ahmad Dahlan & IAES",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "Rolling Submission",
+    "url": "[https://telkomnika.uad.ac.id/](https://telkomnika.uad.ac.id/)"
+  },
+  {
+    "name": "Civil Engineering Dimension",
+    "rank": "SINTA 1",
+    "issn": "1979-570X (Online)",
+    "publisher": "Petra Christian University",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "24 weeks",
+    "url": "[https://ced.petra.ac.id/](https://ced.petra.ac.id/)"
+  },
+  {
+    "name": "Indonesian Journal of Chemistry",
+    "rank": "SINTA 1",
+    "issn": "2460-1578 (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Science",
+    "specific_focus": [
+      "Chemistry",
+      "Chemical Engineering",
+      "Applied Chemistry"
+    ],
+    "avg_processing_time": "6-10 weeks",
+    "url": "[https://jurnal.ugm.ac.id/ijc](https://jurnal.ugm.ac.id/ijc)"
+  },
+  {
+    "name": "Indonesian Journal of Geography",
+    "rank": "SINTA 1",
+    "issn": "2354-9114 (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Science",
+    "specific_focus": [],
+    "avg_processing_time": "8 weeks",
+    "url": "[https://jurnal.ugm.ac.id/ijg](https://jurnal.ugm.ac.id/ijg)"
+  },
+  {
+    "name": "Cakrawala Pendidikan",
+    "rank": "SINTA 1",
+    "issn": "2442-8620 (Online)",
+    "publisher": "Universitas Negeri Yogyakarta",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "7 weeks",
+    "url": "[https://journal.uny.ac.id/index.php/cp](https://journal.uny.ac.id/index.php/cp)"
+  },
+  {
+    "name": "Hasanuddin Law Review",
+    "rank": "SINTA 1",
+    "issn": "2442-9899 (Online)",
+    "publisher": "Universitas Hasanuddin",
+    "broad_field": "Law",
+    "specific_focus": [],
+    "avg_processing_time": "4-8 weeks",
+    "url": "[https://journal.unhas.ac.id/index.php/hcblr](https://journal.unhas.ac.id/index.php/hcblr)"
+  },
+  {
+    "name": "Sriwijaya Law Review",
+    "rank": "SINTA 1",
+    "issn": "2541-6464 (Online)",
+    "publisher": "Universitas Sriwijaya",
+    "broad_field": "Law",
+    "specific_focus": [
+      "Constitutional Law",
+      "Administrative Law",
+      "International Law"
+    ],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://journal.fh.unsri.ac.id/index.php/sriwijayalawreview](https://journal.fh.unsri.ac.id/index.php/sriwijayalawreview)"
+  },
+  {
+    "name": "Journal of Indonesian Economy and Business",
+    "rank": "SINTA 1",
+    "issn": "2338-5847 (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Economy",
+    "specific_focus": [],
+    "avg_processing_time": "21 weeks",
+    "url": "[https://jurnal.ugm.ac.id/jieb](https://jurnal.ugm.ac.id/jieb)"
+  },
+  {
+    "name": "Padjadjaran Jurnal Ilmu Hukum",
+    "rank": "SINTA 1",
+    "issn": "2442-9325 (Online)",
+    "publisher": "Universitas Padjadjaran",
+    "broad_field": "Law",
+    "specific_focus": [],
+    "avg_processing_time": "12+ weeks",
+    "url": "[https://jurnal.unpad.ac.id/pjih](https://jurnal.unpad.ac.id/pjih)"
+  },
+  {
+    "name": "Harmonia: Journal of Arts Research and Education",
+    "rank": "SINTA 1",
+    "issn": "2541-2426 (Online)",
+    "publisher": "Universitas Negeri Semarang",
+    "broad_field": "Arts",
+    "specific_focus": [],
+    "avg_processing_time": "12+ weeks",
+    "url": "[https://journal.unnes.ac.id/journals/harmonia](https://journal.unnes.ac.id/journals/harmonia)"
+  },
+  {
+    "name": "Indonesian Journal of Electrical Engineering and Computer Science",
+    "rank": "SINTA 1",
+    "issn": "2502-4760 (Online)",
+    "publisher": "IAES",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "Rolling Submission",
+    "url": "[https://ijeecs.iaescore.com/](https://ijeecs.iaescore.com/)"
+  },
+  {
+    "name": "International Journal of Electrical and Computer Engineering",
+    "rank": "SINTA 1",
+    "issn": "2722-2578 (Online)",
+    "publisher": "IAES",
+    "broad_field": "Engineering",
+    "specific_focus": [
+      "Computer Engineering",
+      "Electrical Power",
+      "Electronics"
+    ],
+    "avg_processing_time": "Rolling Submission",
+    "url": "[https://ijece.iaescore.com/](https://ijece.iaescore.com/)"
+  },
+  {
+    "name": "Indonesian Journal of Biotechnology",
+    "rank": "SINTA 1",
+    "issn": "2089-2241 (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Science",
+    "specific_focus": [],
+    "avg_processing_time": "10-14 weeks",
+    "url": "[https://jurnal.ugm.ac.id/ijbiotech](https://jurnal.ugm.ac.id/ijbiotech)"
+  },
+  {
+    "name": "Caraka Tani: Journal of Sustainable Agriculture",
+    "rank": "SINTA 2",
+    "issn": "2598-5078 (Online)",
+    "publisher": "Universitas Sebelas Maret",
+    "broad_field": "Agriculture",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://jurnal.uns.ac.id/carakatani](https://jurnal.uns.ac.id/carakatani)"
+  },
+  {
+    "name": "Jurnal Pendidikan Vokasi",
+    "rank": "SINTA 2",
+    "issn": "2476-9401 (Online)",
+    "publisher": "Universitas Negeri Yogyakarta",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "16 weeks",
+    "url": "[https://journal.uny.ac.id/index.php/jpv](https://journal.uny.ac.id/index.php/jpv)"
+  },
+  {
+    "name": "agriTECH",
+    "rank": "SINTA 2",
+    "issn": "2527-3825 (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Agriculture",
+    "specific_focus": [],
+    "avg_processing_time": "12-20 weeks",
+    "url": "[https://jurnal.ugm.ac.id/agritech](https://jurnal.ugm.ac.id/agritech)"
+  },
+  {
+    "name": "Jurnal Agronomi Indonesia",
+    "rank": "SINTA 2",
+    "issn": "2085-2916 (Online)",
+    "publisher": "IPB University",
+    "broad_field": "Agriculture",
+    "specific_focus": [],
+    "avg_processing_time": "12+ weeks",
+    "url": "[https://journal.ipb.ac.id/index.php/jurnalagronomi](https://journal.ipb.ac.id/index.php/jurnalagronomi)"
+  },
+  {
+    "name": "Masalah-Masalah Hukum",
+    "rank": "SINTA 2",
+    "issn": "2527-4716 (Online)",
+    "publisher": "Universitas Diponegoro",
+    "broad_field": "Law",
+    "specific_focus": [
+      "Legal Issues",
+      "Criminal Law",
+      "Civil Law"
+    ],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://ejournal.undip.ac.id/index.php/mmh](https://ejournal.undip.ac.id/index.php/mmh)"
+  },
+  {
+    "name": "Jurnal Penelitian dan Evaluasi Pendidikan",
+    "rank": "SINTA 2",
+    "issn": "2338-6061 (Online)",
+    "publisher": "Universitas Negeri Yogyakarta",
+    "broad_field": "Education",
+    "specific_focus": [
+      "Educational Assessment",
+      "Evaluation",
+      "Psychometrics"
+    ],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://journal.uny.ac.id/index.php/jpep](https://journal.uny.ac.id/index.php/jpep)"
+  },
+  {
+    "name": "REID (Research and Evaluation in Education)",
+    "rank": "SINTA 2",
+    "issn": "2460-6995 (Online)",
+    "publisher": "Universitas Negeri Yogyakarta",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://journal.uny.ac.id/index.php/reid](https://journal.uny.ac.id/index.php/reid)"
+  },
+  {
+    "name": "Etnosia: Jurnal Etnografi Indonesia",
+    "rank": "SINTA 2",
+    "issn": "2548-9747 (Online)",
+    "publisher": "Universitas Hasanuddin",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://journal.unhas.ac.id/index.php/etnosia](https://journal.unhas.ac.id/index.php/etnosia)"
+  },
+  {
+    "name": "Jurnal Komunikasi Ikatan Sarjana Komunikasi Indonesia",
+    "rank": "SINTA 2",
+    "issn": "2548-8740 (Online)",
+    "publisher": "ISKI",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://jurnal-iski.or.id/](https://jurnal-iski.or.id/)"
+  },
+  {
+    "name": "Rekayasa Mesin",
+    "rank": "SINTA 2",
+    "issn": "2477-6041 (Online)",
+    "publisher": "Universitas Brawijaya",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://rekayasamesin.ub.ac.id/](https://rekayasamesin.ub.ac.id/)"
+  },
+  {
+    "name": "Jurnal Polimesin",
+    "rank": "SINTA 2",
+    "issn": "2549-1199 (Online)",
+    "publisher": "Politeknik Negeri Lhokseumawe",
+    "broad_field": "Engineering",
+    "specific_focus": [
+      "Applied Mechanical Engineering",
+      "Manufacturing"
+    ],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://e-jurnal.pnl.ac.id/polimesin](https://e-jurnal.pnl.ac.id/polimesin)"
+  },
+  {
+    "name": "Jurnal Cita Hukum",
+    "rank": "SINTA 2",
+    "issn": "2442-7306 (Online)",
+    "publisher": "UIN Syarif Hidayatullah",
+    "broad_field": "Law",
+    "specific_focus": [
+      "Islamic Law",
+      "Positive Law",
+      "Legal Integration"
+    ],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://journal.uinjkt.ac.id/index.php/citahukum](https://journal.uinjkt.ac.id/index.php/citahukum)"
+  },
+  {
+    "name": "Yuridika",
+    "rank": "SINTA 2",
+    "issn": "2528-3103 (Online)",
+    "publisher": "Universitas Airlangga",
+    "broad_field": "Law",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://e-journal.unair.ac.id/YDK](https://e-journal.unair.ac.id/YDK)"
+  },
+  {
+    "name": "Jurnal Wawasan Yuridika",
+    "rank": "SINTA 2",
+    "issn": "2549-0753 (Online)",
+    "publisher": "STHB Bandung",
+    "broad_field": "Law",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://ejournal.sthb.ac.id/index.php/jwy](https://ejournal.sthb.ac.id/index.php/jwy)"
+  },
+  {
+    "name": "Jurnal Psikologi UGM",
+    "rank": "SINTA 3",
+    "issn": "2460-867X (Online)",
+    "publisher": "Universitas Gadjah Mada",
+    "broad_field": "Psychology",
+    "specific_focus": [],
+    "avg_processing_time": "20+ weeks",
+    "url": "[https://jurnal.ugm.ac.id/jpsi](https://jurnal.ugm.ac.id/jpsi)"
+  },
+  {
+    "name": "Mozaik Humaniora",
+    "rank": "SINTA 3",
+    "issn": "2442-935X (Online)",
+    "publisher": "Universitas Airlangga",
+    "broad_field": "Humanities",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://e-journal.unair.ac.id/MOZAIK](https://e-journal.unair.ac.id/MOZAIK)"
+  },
+  {
+    "name": "Komunikatif: Jurnal Ilmiah Komunikasi",
+    "rank": "SINTA 3",
+    "issn": "2597-6699 (Online)",
+    "publisher": "Unika Widya Mandala Surabaya",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://journal.ukwms.ac.id/index.php/KOMUNIKATIF](https://journal.ukwms.ac.id/index.php/KOMUNIKATIF)"
+  },
+  {
+    "name": "Jurnal Teknik Mesin",
+    "rank": "SINTA 3",
+    "issn": "2656-3290 (Online)",
+    "publisher": "Petra Christian University",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://jurnalmesin.petra.ac.id/](https://jurnalmesin.petra.ac.id/)"
+  },
+  {
+    "name": "Infotekmesin",
+    "rank": "SINTA 3",
+    "issn": "2685-9858 (Online)",
+    "publisher": "Politeknik Negeri Cilacap",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://ejournal.pnc.ac.id/index.php/infotekmesin](https://ejournal.pnc.ac.id/index.php/infotekmesin)"
+  },
+  {
+    "name": "Media Komunikasi Teknik Sipil",
+    "rank": "SINTA 3",
+    "issn": "2549-6778 (Online)",
+    "publisher": "Universitas Diponegoro",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://ejournal.undip.ac.id/index.php/mkts](https://ejournal.undip.ac.id/index.php/mkts)"
+  },
+  {
+    "name": "Jurnal Teknik Sipil",
+    "rank": "SINTA 3",
+    "issn": "2502-5295 (Online)",
+    "publisher": "Universitas Syiah Kuala",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://jurnal.usk.ac.id/JTS](https://jurnal.usk.ac.id/JTS)"
+  },
+  {
+    "name": "Jurnal Ilmiah Pertanian",
+    "rank": "SINTA 3",
+    "issn": "2502-5988 (Online)",
+    "publisher": "Universitas Lancang Kuning",
+    "broad_field": "Agriculture",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://journal.unilak.ac.id/index.php/jip](https://journal.unilak.ac.id/index.php/jip)"
+  },
+  {
+    "name": "Jurnal Ilmiah Peuradeun",
+    "rank": "SINTA 3",
+    "issn": "2443-2067 (Online)",
+    "publisher": "SCAD Independent",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12+ weeks",
+    "url": "[https://journal.scadindependent.org/](https://journal.scadindependent.org/)"
+  },
+  {
+    "name": "Media Mesin",
+    "rank": "SINTA 3",
+    "issn": "2541-4577 (Online)",
+    "publisher": "Universitas Muhammadiyah Surakarta",
+    "broad_field": "Engineering",
+    "specific_focus": [
+      "Mechanical Engineering",
+      "Automotive Engineering"
+    ],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://journals.ums.ac.id/index.php/mesin](https://journals.ums.ac.id/index.php/mesin)"
+  },
+  {
+    "name": "IJouGS: Indonesian Journal of Gender Studies",
+    "rank": "SINTA 4",
+    "issn": "2745-861X (Online)",
+    "publisher": "IAIN Ponorogo",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "12-16 weeks",
+    "url": "[https://jurnal.iainponorogo.ac.id/index.php/ijougs](https://jurnal.iainponorogo.ac.id/index.php/ijougs)"
+  },
+  {
+    "name": "Jurnal TAM (Technology Acceptance Model)",
+    "rank": "SINTA 4",
+    "issn": "2579-4221 (Online)",
+    "publisher": "STMIK Pringsewu",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "Rolling Submission",
+    "url": "[https://jurnal.ftikomibn.ac.id/index.php/JurnalTam](https://jurnal.ftikomibn.ac.id/index.php/JurnalTam)"
+  },
+  {
+    "name": "At-Tawassuth: Jurnal Ekonomi Islam",
+    "rank": "SINTA 4",
+    "issn": "2549-0230 (Online)",
+    "publisher": "UIN Sumatera Utara",
+    "broad_field": "Economy",
+    "specific_focus": [],
+    "avg_processing_time": "4 weeks",
+    "url": "[https://jurnal.uinsu.ac.id/index.php/tawassuth](https://jurnal.uinsu.ac.id/index.php/tawassuth)"
+  },
+  {
+    "name": "Jurnal Bioeduin",
+    "rank": "SINTA 4",
+    "issn": "2615-0417 (Online)",
+    "publisher": "UIN Sunan Gunung Djati Bandung",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://journal.uinsgd.ac.id/index.php/bioeduin](https://journal.uinsgd.ac.id/index.php/bioeduin)"
+  },
+  {
+    "name": "Indonesian Journal of Teaching in Science",
+    "rank": "SINTA 4",
+    "issn": "2776-6152 (Online)",
+    "publisher": "Universitas Pendidikan Indonesia",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://ejournal.upi.edu/index.php/IJoTS](https://ejournal.upi.edu/index.php/IJoTS)"
+  },
+  {
+    "name": "Jurnal Ilmiah Matematika Realistik",
+    "rank": "SINTA 5",
+    "issn": "2723-6153 (Online)",
+    "publisher": "Universitas Teknokrat Indonesia",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://jim.teknokrat.ac.id/index.php/pendidikanmatematika](https://jim.teknokrat.ac.id/index.php/pendidikanmatematika)"
+  },
+  {
+    "name": "Jurnal Teknik dan Sistem Komputer",
+    "rank": "SINTA 5",
+    "issn": "2723-6382 (Online)",
+    "publisher": "Universitas Teknokrat Indonesia",
+    "broad_field": "Engineering",
+    "specific_focus": [],
+    "avg_processing_time": "12 weeks",
+    "url": "[https://publikasi.teknokrat.ac.id/index.php/jtikom](https://publikasi.teknokrat.ac.id/index.php/jtikom)"
+  },
+  {
+    "name": "JIMBI (Jurnal Ilmiah Manajemen dan Bisnis)",
+    "rank": "SINTA 5",
+    "issn": "2774-3004 (Online)",
+    "publisher": "Universitas Medan Area",
+    "broad_field": "Economy",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://jurnalmahasiswa.uma.ac.id/index.php/jimbi](https://jurnalmahasiswa.uma.ac.id/index.php/jimbi)"
+  },
+  {
+    "name": "Progres Pendidikan",
+    "rank": "SINTA 5",
+    "issn": "2721-9348 (Online)",
+    "publisher": "Universitas Mataram",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://prospek.unram.ac.id](https://prospek.unram.ac.id)"
+  },
+  {
+    "name": "Muttaqien: Indonesian Journal of Multidiciplinary Islamic Studies",
+    "rank": "SINTA 5",
+    "issn": "2723-5963 (Online)",
+    "publisher": "STAI DR. KHEZ. Muttaqien",
+    "broad_field": "Social Sciences",
+    "specific_focus": [],
+    "avg_processing_time": "8-12 weeks",
+    "url": "[https://e-jurnal.staimuttaqien.ac.id/index.php/mtq](https://e-jurnal.staimuttaqien.ac.id/index.php/mtq)"
+  },
+  {
+    "name": "Jurnal Basicedu",
+    "rank": "SINTA 5",
+    "issn": "2580-1147 (Online)",
+    "publisher": "Universitas Pahlawan Tuanku Tambusai",
+    "broad_field": "Education",
+    "specific_focus": [],
+    "avg_processing_time": "4-8 weeks",
+    "url": "[https://jbasic.org/index.php/basicedu](https://jbasic.org/index.php/basicedu)"
+  }
+]
