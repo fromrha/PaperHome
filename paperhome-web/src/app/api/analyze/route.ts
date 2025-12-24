@@ -22,12 +22,20 @@ export async function POST(req: NextRequest) {
         if (file.type === 'application/pdf') {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const pdf = require('pdf-parse');
-                const data = await pdf(buffer);
-                textForAnalysis = data.text;
+                const PDFParser = require('pdf2json');
+                const pdfParser = new PDFParser(null, 1); // 1 = text only
+
+                textForAnalysis = await new Promise((resolve, reject) => {
+                    pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError)));
+                    pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+                        // Extract text from the raw data
+                        resolve(pdfParser.getRawTextContent());
+                    });
+
+                    pdfParser.parseBuffer(buffer);
+                });
             } catch (e: any) {
                 console.error('PDF Parse Error:', e);
-                // Return original error message to help debug
                 return NextResponse.json({ error: `Failed to parse PDF: ${e.message || e}` }, { status: 500 });
             }
         } else if (
