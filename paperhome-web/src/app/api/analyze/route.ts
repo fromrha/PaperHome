@@ -24,20 +24,15 @@ export async function POST(req: NextRequest) {
             try {
                 // Dynamic import to handle bundling issues
                 const pdfModule = await import('pdf-parse');
-                // The module exports PDFParse as a class constructor
-                const PDFParseClass = (pdfModule as any).PDFParse;
+                // v1.1.1 exports the function as default or module.exports
+                const pdf = (pdfModule as any).default || pdfModule;
 
-                if (!PDFParseClass) {
-                    throw new Error('PDFParse class not found in pdf-parse module');
+                if (typeof pdf !== 'function') {
+                    throw new Error(`pdf-parse library is not a function. It is: ${typeof pdf}`);
                 }
 
-                // Instantiate the parser with options and parse the buffer
-                const options = {
-                    verbosity: 0, // Suppress warnings/logs
-                    max: 0 // Parse all pages (0 = no limit)
-                };
-                const parser = new PDFParseClass(options);
-                const data = await parser.parse(buffer);
+                // v1.1.1 is simple: pdf(buffer) -> Promise<data>
+                const data = await pdf(buffer);
                 textForAnalysis = data.text;
             } catch (e: any) {
                 console.error('PDF Parse Error:', e);
