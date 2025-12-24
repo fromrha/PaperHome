@@ -49,7 +49,12 @@ export default function Home() {
     return currentList.filter(journal => {
       // SINTA Filter (National only)
       if (activeTab === 'national' && filters.sinta.length > 0) {
-        if (!filters.sinta.some(s => journal.rank.includes(s))) return false;
+        // Log for debugging (simulated idea)
+        // Check if any of the selected filters match the journal rank
+        // Rank in JSON is exactly "SINTA 1", "SINTA 2", etc.
+        // Filters are also "SINTA 1", "SINTA 2", etc.
+        const match = filters.sinta.some(s => journal.rank.includes(s));
+        if (!match) return false;
       }
 
       // Quartile & Indexing Filter (International only)
@@ -280,7 +285,7 @@ export default function Home() {
         <section className="animate-in slide-in-from-bottom-4 duration-500">
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold flex items-center gap-2">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800">
                 <Sparkles className="text-purple-500" size={24} />
                 Analysis Results
               </h3>
@@ -441,59 +446,96 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  {(activeTab === 'national' ? results.national : results.international).slice(0, visibleCount).map((journal, idx) => {
+                  {filteredList.slice(0, visibleCount).map((journal, idx) => {
                     // Simulated Match Score Logic: Top result 98%, decreases slightly
                     const matchScore = Math.max(65, 98 - (idx * 2)); // Minimum 65%
-                    let scoreColor = 'bg-slate-100 text-slate-600';
-                    if (matchScore >= 80) scoreColor = 'bg-emerald-100 text-emerald-700';
-                    else if (matchScore >= 60) scoreColor = 'bg-amber-100 text-amber-700';
+
+                    // Color Logic
+                    let strokeColor = '#64748b'; // Slate (default)
+                    if (matchScore >= 80) strokeColor = '#10b981'; // Emerald
+                    else if (matchScore >= 60) strokeColor = '#f59e0b'; // Amber
+
+                    // SVG Circle Props
+                    const radius = 30;
+                    const circumference = 2 * Math.PI * radius;
+                    const offset = circumference - (matchScore / 100) * circumference;
 
                     return (
                       <div
                         key={idx}
                         onClick={() => setSelectedJournal(journal)}
-                        className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex items-start gap-4 cursor-pointer group"
+                        className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex items-start gap-6 cursor-pointer group"
                       >
-                        {/* Match Score Pill */}
-                        <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${scoreColor}`}>
-                          <span className="text-lg font-bold leading-none">{matchScore}%</span>
-                          <span className="text-[10px] uppercase font-bold opacity-80 mt-0.5">Match</span>
+                        {/* Circular Match Score */}
+                        <div className="relative shrink-0 flex items-center justify-center -ml-2">
+                          <svg width="80" height="80" viewBox="0 0 80 80" className="transform -rotate-90">
+                            {/* Background Circle */}
+                            <circle
+                              cx="40"
+                              cy="40"
+                              r={radius}
+                              stroke="#f1f5f9"
+                              strokeWidth="6"
+                              fill="none"
+                            />
+                            {/* Progress Circle */}
+                            <circle
+                              cx="40"
+                              cy="40"
+                              r={radius}
+                              stroke={strokeColor}
+                              strokeWidth="6"
+                              fill="none"
+                              strokeDasharray={circumference}
+                              strokeDashoffset={offset}
+                              strokeLinecap="round"
+                              className="transition-all duration-1000 ease-out"
+                            />
+                          </svg>
+                          {/* Score Text */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span className="text-xl font-bold text-slate-800 leading-none">{matchScore}</span>
+                            <span className="text-[9px] font-medium text-slate-400 uppercase mt-0.5">Match</span>
+                          </div>
                         </div>
 
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 py-1">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-lg font-bold text-slate-800 break-words leading-tight flex items-start justify-between gap-2" title={journal.name}>
-                                {journal.name}
-                              </h4>
-                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm text-slate-500">
-                                <span className="break-words font-medium">{journal.publisher}</span>
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="text-xl font-bold text-slate-800 break-words leading-tight" title={journal.name}>
+                                  {journal.name}
+                                </h4>
+                                {/* Rank Badge Resituated Here */}
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
+                                  journal.rank.includes('Scopus') || journal.rank.includes('SCIE') || journal.rank.includes('SSCI') ? 'bg-purple-100 text-purple-700' :
+                                    'bg-slate-100 text-slate-600'
+                                  }`}>
+                                  {journal.rank}
+                                </span>
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
+                                <span className="break-words font-medium text-slate-700">{journal.publisher}</span>
                                 <div className="flex items-center gap-2">
                                   <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
-                                  <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs">{journal.issn}</span>
+                                  <span className="font-mono bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded text-xs text-slate-500">{journal.issn}</span>
                                 </div>
-                                {/* Processing Time relocated here */}
+                                {/* Processing Time */}
                                 <div className="flex items-center gap-2">
                                   <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
-                                  <span className="text-xs font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                                  <span className="text-xs font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100">
                                     ⏱️ {journal.avg_processing_time || 'Unknown'}
                                   </span>
                                 </div>
                               </div>
                             </div>
-                            {/* Rank Badge */}
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
-                              journal.rank.includes('Scopus') || journal.rank.includes('SCIE') || journal.rank.includes('SSCI') ? 'bg-purple-100 text-purple-700' :
-                                'bg-slate-100 text-slate-600'
-                              }`}>
-                              {journal.rank}
-                            </span>
                           </div>
 
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-4 flex flex-wrap gap-2">
                             {(Array.isArray(journal.specific_focus) ? journal.specific_focus : [journal.specific_focus]).map((tag: string | unknown, i: number) => (
                               typeof tag === 'string' && (
-                                <span key={i} className="px-2.5 py-1 bg-slate-50 text-slate-600 text-xs rounded-md border border-slate-100 break-words max-w-full">
+                                <span key={i} className="px-3 py-1 bg-white text-slate-600 text-xs font-medium rounded-full border border-slate-200 shadow-sm break-words max-w-full">
                                   {tag}
                                 </span>
                               )
@@ -508,7 +550,7 @@ export default function Home() {
                               e.stopPropagation();
                               window.open(journal.url, '_blank', 'noopener,noreferrer');
                             }}
-                            className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors text-sm font-medium whitespace-nowrap shadow-sm shadow-blue-200"
+                            className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl transition-colors text-sm font-semibold whitespace-nowrap shadow-md shadow-blue-200"
                           >
                             Visit Website
                           </button>
@@ -518,7 +560,7 @@ export default function Home() {
                   })}
 
                   {/* Pagination / Show More */}
-                  {(activeTab === 'national' ? results.national : results.international).length > visibleCount ? (
+                  {filteredList.length > visibleCount ? (
                     <div className="flex justify-center pt-4">
                       <button
                         onClick={() => setVisibleCount(prev => prev + 5)}
