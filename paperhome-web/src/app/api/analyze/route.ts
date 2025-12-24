@@ -22,18 +22,28 @@ export async function POST(req: NextRequest) {
         if (file.type === 'application/pdf') {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const PDFParser = require('pdf2json');
-                const pdfParser = new PDFParser(null, 1); // 1 = text only
+                const pdfjsLib = require('pdfjs-dist');
 
-                textForAnalysis = await new Promise((resolve, reject) => {
-                    pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError)));
-                    pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
-                        // Extract text from the raw data
-                        resolve(pdfParser.getRawTextContent());
-                    });
+                // Convert Buffer to Uint8Array for pdfjs
+                const uint8Array = new Uint8Array(buffer);
 
-                    pdfParser.parseBuffer(buffer);
-                });
+                const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+                const pdfDocument = await loadingTask.promise;
+
+                let fullText = '';
+                const numPages = pdfDocument.numPages;
+
+                // Limit pages to avoid timeout on large docs (e.g., first 10 pages)
+                const maxPages = Math.min(numPages, 10);
+
+                for (let i = 1; i <= maxPages; i++) {
+                    const page = await pdfDocument.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map((item: any) => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                textForAnalysis = fullText;
             } catch (e: any) {
                 console.error('PDF Parse Error:', e);
                 return NextResponse.json({ error: `Failed to parse PDF: ${e.message || e}` }, { status: 500 });
