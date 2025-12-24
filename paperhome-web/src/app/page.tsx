@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, FileText, Search, Globe, MapPin, ExternalLink, Loader2, Sparkles } from 'lucide-react';
-// I'll stick to template literals if clsx isn't guaranteed, but I queued installation. 
-// Let's use standard string concat for safety or checking valid syntax.
 
 type Journal = {
   name: string;
@@ -11,7 +9,7 @@ type Journal = {
   issn: string;
   publisher: string;
   broad_field: string;
-  specific_focus: string[] | string; // Normalized later
+  specific_focus: string[] | string;
   avg_processing_time: string;
   url: string;
   source?: string;
@@ -23,8 +21,6 @@ type AnalysisResult = {
   summary: string;
 };
 
-
-
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -34,6 +30,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'national' | 'international'>('national');
   const [error, setError] = useState<string | null>(null);
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
+  const [analysisStep, setAnalysisStep] = useState<string>('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -49,9 +46,21 @@ export default function Home() {
 
     setAnalyzing(true);
     setError(null);
+    setAnalysisStep("Reading file content...");
 
     const formData = new FormData();
     formData.append('file', file);
+
+    // Simulated progress timer
+    const progressTimer = setInterval(() => {
+      setAnalysisStep((prev) => {
+        if (prev === "Reading file content...") return "Extracting text structure...";
+        if (prev === "Extracting text structure...") return "Sending to Gemini AI...";
+        if (prev === "Sending to Gemini AI...") return "Analyzing research field...";
+        if (prev === "Analyzing research field...") return "Generating keywords...";
+        return prev;
+      });
+    }, 1500);
 
     try {
       const res = await fetch('/api/analyze', {
@@ -65,11 +74,18 @@ export default function Home() {
       }
 
       const data = await res.json();
+      setAnalysisStep("Finalizing results...");
+
+      // Artificial delay to show the final step briefly
+      await new Promise(r => setTimeout(r, 800));
+
       setAnalysis(data);
     } catch (err: unknown) {
       setError((err as Error).message);
     } finally {
+      clearInterval(progressTimer);
       setAnalyzing(false);
+      setAnalysisStep('');
     }
   };
 
@@ -113,15 +129,15 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity -mr-16 -mt-16"></div>
 
         <div className="relative z-10 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 bg-slate-50/50 hover:bg-white hover:border-blue-400 transition-all duration-300">
-          <input
-            type="file"
-            accept=".pdf,.txt" // Only accept PDF or Text
-            onChange={handleFileChange}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
 
           {!file ? (
             <>
+              <input
+                type="file"
+                accept=".pdf,.txt"
+                onChange={handleFileChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
               <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 shadow-sm">
                 <Upload size={32} />
               </div>
@@ -131,28 +147,40 @@ export default function Home() {
               </p>
             </>
           ) : (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full max-w-md">
+              {/* Hidden input to allow re-upload if needed, primarily handled by Change File button though */}
+
               <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 shadow-sm animate-bounce-short">
                 <FileText size={32} />
               </div>
-              <h3 className="text-xl font-semibold text-slate-800 mb-1">{file.name}</h3>
+              <h3 className="text-xl font-semibold text-slate-800 mb-1 text-center break-all">{file.name}</h3>
               <p className="text-slate-500 text-sm mb-6">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setFile(null)}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium text-sm"
-                >
-                  Change File
-                </button>
+              <div className="flex flex-col gap-3 items-center w-full">
                 {!analysis && (
+                  <>
+                    <button
+                      onClick={handleAnalyze}
+                      disabled={analyzing}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-200 flex items-center justify-center gap-2 transition-all disabled:opacity-80 disabled:cursor-wait w-full sm:w-auto min-w-[200px]"
+                    >
+                      {analyzing ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
+                      {analyzing ? 'Analyzing...' : 'Analyze Paper'}
+                    </button>
+                    {analyzing && (
+                      <p className="text-sm font-medium text-blue-600 animate-pulse mt-2">
+                        {analysisStep}
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {!analyzing && (
                   <button
-                    onClick={handleAnalyze}
-                    disabled={analyzing}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-200 flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    onClick={() => setFile(null)}
+                    className="px-4 py-2 text-slate-500 hover:text-slate-700 font-medium text-sm mt-2"
                   >
-                    {analyzing ? <Loader2 className="animate-spin" size={18} /> : <Sparkles size={18} />}
-                    Analyze Paper
+                    Change File
                   </button>
                 )}
               </div>
@@ -163,7 +191,7 @@ export default function Home() {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 flex items-center gap-2">
+        <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 flex items-center gap-2 animate-in slide-in-from-top-2">
           <span className="font-bold">Error:</span> {error}
         </div>
       )}
@@ -263,8 +291,8 @@ export default function Home() {
                         </div>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
-                          journal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
-                            'bg-slate-100 text-slate-600'
+                        journal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
+                          'bg-slate-100 text-slate-600'
                         }`}>
                         {journal.rank}
                       </span>
@@ -319,8 +347,8 @@ export default function Home() {
 
             <div className="mb-6">
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${selectedJournal.rank.includes('SINTA 1') || selectedJournal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
-                  selectedJournal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
-                    'bg-slate-100 text-slate-600'
+                selectedJournal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
+                  'bg-slate-100 text-slate-600'
                 }`}>
                 {selectedJournal.rank}
               </span>

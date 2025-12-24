@@ -58,7 +58,7 @@ export default function Sidebar() {
                             RA
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-slate-700">Rahma A.</p>
+                            <p className="text-sm font-semibold text-slate-700">Rahman H.</p>
                             <p className="text-xs text-slate-500">Researcher</p>
                         </div>
                     </div>
@@ -78,8 +78,8 @@ export default function Sidebar() {
                                         setShowCitationModal(false);
                                     }}
                                     className={`w-full flex items-center justify-between p-3 rounded-xl border text-sm font-medium transition-all ${citationStyle === style
-                                            ? 'bg-blue-50 border-blue-200 text-blue-700'
-                                            : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                        : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'
                                         }`}
                                 >
                                     {style}
