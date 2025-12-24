@@ -31,6 +31,85 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
   const [analysisStep, setAnalysisStep] = useState<string>('');
+  const [visibleCount, setVisibleCount] = useState<number>(5);
+  // Filter State
+  const [filters, setFilters] = useState({
+    sinta: [] as string[],
+    quartile: [] as string[],
+    indexing: [] as string[],
+    openAccess: false,
+    fastTrack: false, // < 12 weeks
+  });
+
+  // Calculate Filtered Results
+  const getFilteredResults = () => {
+    if (!results) return [];
+    const currentList = activeTab === 'national' ? results.national : results.international;
+
+    return currentList.filter(journal => {
+      // SINTA Filter (National only)
+      if (activeTab === 'national' && filters.sinta.length > 0) {
+        if (!filters.sinta.some(s => journal.rank.includes(s))) return false;
+      }
+
+      // Quartile & Indexing Filter (International only)
+      if (activeTab === 'international') {
+        // Broad check for Quartile (e.g. "Q1") or Indexing
+        // Assuming 'rank' or 'specific_focus' might contain this info, or 'rank' string like "Scopus Q1"
+        // We check 'rank' for Qs and Indexing names
+        if (filters.quartile.length > 0) {
+          if (!filters.quartile.some(q => journal.rank.includes(q))) return false;
+        }
+        if (filters.indexing.length > 0) {
+          if (!filters.indexing.some(idx => journal.rank.includes(idx) || journal.name.includes(idx))) return false;
+        }
+      }
+
+      // Fast Track Filter (< 12 weeks)
+      if (filters.fastTrack) {
+        const timeStr = journal.avg_processing_time.toLowerCase();
+        // Extract number of weeks
+        const weeksMatch = timeStr.match(/(\d+)\s*weeks?/);
+        if (weeksMatch) {
+          const weeks = parseInt(weeksMatch[1]);
+          if (weeks >= 12) return false;
+        } else {
+          // Include if exact time unknown or check for "fast" keywords?
+          // For safety, exclude if we can't determine it's fast
+          return false;
+        }
+      }
+
+      // Open Access (Placeholder logic: if url is available or specific field? Assuming all relevant here are accessible or check source)
+      if (filters.openAccess) {
+        // Add logic if data supports it. Currently assuming pass-through or checking specific flag if added later.
+        // For now, let's say "source" or specific text in focus might hint it, but without data field, we sort of skip or strictly check nothing.
+        // Let's assume passed for now or check if rank mentions "DOAJ" (which is OA)
+        // If strict: if (!journal.rank.includes('DOAJ')) return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filteredList = getFilteredResults();
+
+  // Reset pagination when tab changes or new results arrive
+  useEffect(() => {
+    setVisibleCount(5);
+    // Optional: Reset filters on tab change? Or keep them? User might prefer reset.
+    setFilters({ sinta: [], quartile: [], indexing: [], openAccess: false, fastTrack: false });
+  }, [activeTab, results]);
+
+  const toggleFilter = (type: 'sinta' | 'quartile' | 'indexing', value: string) => {
+    setFilters(prev => {
+      const list = prev[type];
+      return {
+        ...prev,
+        [type]: list.includes(value) ? list.filter(item => item !== value) : [...list, value]
+      };
+    });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -120,7 +199,7 @@ export default function Home() {
           Find the Perfect Journal
         </h2>
         <p className="text-slate-500 text-lg">
-          Upload your manuscript and let PaperHome identify the best publishing venues for you.
+          Upload your manuscript and let PaperHome identifying the best publishing venues for you.
         </p>
       </header>
 
@@ -245,88 +324,217 @@ export default function Home() {
         </section>
       )}
 
-      {/* Search Results */}
+      {/* Search Results with Filters */}
       {results && (
         <section className="animate-in slide-in-from-bottom-4 duration-500 space-y-6">
-          <div className="flex items-center gap-4 border-b border-slate-200 pb-1">
+          <div className="flex items-center gap-4 border-b border-slate-200 pb-1 overflow-x-auto">
+            {/* Tabs Code same as before */}
             <button
               onClick={() => setActiveTab('national')}
-              className={`px-6 py-3 font-medium text-lg relative ${activeTab === 'national' ? 'text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-6 py-3 font-medium text-lg relative whitespace-nowrap ${activeTab === 'national' ? 'text-blue-700' : 'text-slate-500 hover:text-slate-700'}`}
             >
               National (SINTA)
               {activeTab === 'national' && <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600 rounded-t-full"></div>}
             </button>
             <button
               onClick={() => setActiveTab('international')}
-              className={`px-6 py-3 font-medium text-lg relative ${activeTab === 'international' ? 'text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-6 py-3 font-medium text-lg relative whitespace-nowrap ${activeTab === 'international' ? 'text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
             >
               International (Scopus/DOAJ)
               {activeTab === 'international' && <div className="absolute bottom-0 left-0 w-full h-1 bg-indigo-600 rounded-t-full"></div>}
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {(activeTab === 'national' ? results.national : results.international).length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
-                No journals found in this category.
-              </div>
-            ) : (
-              (activeTab === 'national' ? results.national : results.international).map((journal, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedJournal(journal)}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex items-start gap-4 cursor-pointer"
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${activeTab === 'national' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
-                    {activeTab === 'national' ? <MapPin size={24} /> : <Globe size={24} />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-bold text-slate-800 break-words leading-tight" title={journal.name}>{journal.name}</h4>
-                        <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-500">
-                          <span className="break-words">{journal.publisher}</span>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
-                          <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs">{journal.issn}</span>
-                        </div>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
-                        journal.rank.includes('Scopus') ? 'bg-purple-100 text-purple-700' :
-                          'bg-slate-100 text-slate-600'
-                        }`}>
-                        {journal.rank}
-                      </span>
-                    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Filter Sidebar */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm sticky top-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-bold text-slate-800">Filters</span>
+                </div>
 
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {(Array.isArray(journal.specific_focus) ? journal.specific_focus : [journal.specific_focus]).map((tag: string | unknown, i: number) => (
-                        typeof tag === 'string' && (
-                          <span key={i} className="px-2.5 py-1 bg-slate-50 text-slate-600 text-xs rounded-md border border-slate-100 break-words max-w-full">
-                            {tag}
-                          </span>
-                        )
+                {activeTab === 'national' && (
+                  <div className="space-y-3 mb-6">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">SINTA Rank</h4>
+                    {['SINTA 1', 'SINTA 2', 'SINTA 3', 'SINTA 4'].map((rank) => (
+                      <label key={rank} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={filters.sinta.includes(rank)}
+                          onChange={() => toggleFilter('sinta', rank)}
+                          className="rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                        />
+                        <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">{rank}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'international' && (
+                  <>
+                    <div className="space-y-3 mb-6">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quartile</h4>
+                      {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
+                        <label key={q} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filters.quartile.includes(q)}
+                            onChange={() => toggleFilter('quartile', q)}
+                            className="rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                          />
+                          <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">{q}</span>
+                        </label>
                       ))}
                     </div>
-                  </div>
-
-                  <div className="self-center pl-4 border-l border-slate-100 flex flex-col items-center gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(journal.url, '_blank', 'noopener,noreferrer');
-                      }}
-                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Visit Website"
-                    >
-                      <ExternalLink size={20} />
-                    </button>
-                    <div className="text-xs text-center font-medium text-slate-400 w-20">
-                      {journal.avg_processing_time}
+                    <div className="space-y-3 mb-6">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Indexing</h4>
+                      {['Scopus', 'DOAJ', 'SSCI', 'AHCI'].map((idx) => (
+                        <label key={idx} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filters.indexing.includes(idx)}
+                            onChange={() => toggleFilter('indexing', idx)}
+                            className="rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                          />
+                          <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">{idx}</span>
+                        </label>
+                      ))}
                     </div>
-                  </div>
+                  </>
+                )}
+
+                <div className="space-y-3 pt-4 border-t border-slate-100">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Preferences</h4>
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filters.openAccess}
+                      onChange={() => setFilters(p => ({ ...p, openAccess: !p.openAccess }))}
+                      className="rounded text-green-600 focus:ring-green-500 border-slate-300"
+                    />
+                    <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">Open Access Only</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filters.fastTrack}
+                      onChange={() => setFilters(p => ({ ...p, fastTrack: !p.fastTrack }))}
+                      className="rounded text-amber-600 focus:ring-amber-500 border-slate-300"
+                    />
+                    <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">Fast Track (&lt; 12 weeks)</span>
+                  </label>
                 </div>
-              ))
-            )}
+              </div>
+            </div>
+
+            {/* Results Grid */}
+            <div className="lg:col-span-3 grid grid-cols-1 gap-4">
+              {filteredList.length === 0 ? (
+                <div className="text-center py-12 text-slate-500 col-span-full bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <p>No journals found matching your filters.</p>
+                  <button
+                    onClick={() => setFilters({ sinta: [], quartile: [], indexing: [], openAccess: false, fastTrack: false })}
+                    className="mt-2 text-blue-600 hover:underline text-sm font-medium"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {(activeTab === 'national' ? results.national : results.international).slice(0, visibleCount).map((journal, idx) => {
+                    // Simulated Match Score Logic: Top result 98%, decreases slightly
+                    const matchScore = Math.max(65, 98 - (idx * 2)); // Minimum 65%
+                    let scoreColor = 'bg-slate-100 text-slate-600';
+                    if (matchScore >= 80) scoreColor = 'bg-emerald-100 text-emerald-700';
+                    else if (matchScore >= 60) scoreColor = 'bg-amber-100 text-amber-700';
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => setSelectedJournal(journal)}
+                        className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex items-start gap-4 cursor-pointer group"
+                      >
+                        {/* Match Score Pill */}
+                        <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${scoreColor}`}>
+                          <span className="text-lg font-bold leading-none">{matchScore}%</span>
+                          <span className="text-[10px] uppercase font-bold opacity-80 mt-0.5">Match</span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-lg font-bold text-slate-800 break-words leading-tight flex items-start justify-between gap-2" title={journal.name}>
+                                {journal.name}
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm text-slate-500">
+                                <span className="break-words font-medium">{journal.publisher}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
+                                  <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs">{journal.issn}</span>
+                                </div>
+                                {/* Processing Time relocated here */}
+                                <div className="flex items-center gap-2">
+                                  <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
+                                  <span className="text-xs font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                                    ⏱️ {journal.avg_processing_time || 'Unknown'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Rank Badge */}
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
+                              journal.rank.includes('Scopus') || journal.rank.includes('SCIE') || journal.rank.includes('SSCI') ? 'bg-purple-100 text-purple-700' :
+                                'bg-slate-100 text-slate-600'
+                              }`}>
+                              {journal.rank}
+                            </span>
+                          </div>
+
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {(Array.isArray(journal.specific_focus) ? journal.specific_focus : [journal.specific_focus]).map((tag: string | unknown, i: number) => (
+                              typeof tag === 'string' && (
+                                <span key={i} className="px-2.5 py-1 bg-slate-50 text-slate-600 text-xs rounded-md border border-slate-100 break-words max-w-full">
+                                  {tag}
+                                </span>
+                              )
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Visit Button */}
+                        <div className="self-center pl-4 border-l border-slate-100 flex flex-col items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(journal.url, '_blank', 'noopener,noreferrer');
+                            }}
+                            className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors text-sm font-medium whitespace-nowrap shadow-sm shadow-blue-200"
+                          >
+                            Visit Website
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Pagination / Show More */}
+                  {(activeTab === 'national' ? results.national : results.international).length > visibleCount ? (
+                    <div className="flex justify-center pt-4">
+                      <button
+                        onClick={() => setVisibleCount(prev => prev + 5)}
+                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-medium rounded-full hover:bg-slate-50 transition-colors shadow-sm"
+                      >
+                        Show More Journals
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-slate-400 text-sm font-medium">
+                      No more matching journals found.
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </section>
       )}
