@@ -18,6 +18,7 @@ type Journal = {
   matchScore?: number;
   citeScore?: number | string;
   sjr?: number | string;
+  quartile?: string;
 };
 
 type AnalysisResult = {
@@ -68,10 +69,17 @@ export default function Home() {
         // Assuming 'rank' or 'specific_focus' might contain this info, or 'rank' string like "Scopus Q1"
         // We check 'rank' for Qs and Indexing names
         if (filters.quartile.length > 0) {
-          if (!filters.quartile.some(q => journal.rank.includes(q))) return false;
+          if (!filters.quartile.some(q =>
+            (journal.quartile && journal.quartile === q) ||
+            journal.rank.includes(q)
+          )) return false;
         }
         if (filters.indexing.length > 0) {
-          if (!filters.indexing.some(idx => journal.rank.includes(idx) || journal.name.includes(idx))) return false;
+          if (!filters.indexing.some(idx =>
+            journal.rank.includes(idx) ||
+            journal.name.includes(idx) ||
+            (journal.source && journal.source.includes(idx))
+          )) return false;
         }
       }
 

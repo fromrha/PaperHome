@@ -101,6 +101,15 @@ export async function POST(req: NextRequest) {
                                     const citeScore = entry['citeScoreYearInfoList']?.citeScoreCurrentMetric || 0;
                                     const sjr = entry['SJRList']?.SJR?.[0]?.['$'] || 0;
 
+                                    // Infer Quartile from CiteScore (Heuristic)
+                                    // This is an estimation as real quartiles depend on specific field percentiles.
+                                    const cs = Number(citeScore) || 0;
+                                    let quartile = '';
+                                    if (cs >= 4.0) quartile = 'Q1';
+                                    else if (cs >= 2.0) quartile = 'Q2';
+                                    else if (cs >= 1.0) quartile = 'Q3';
+                                    else quartile = 'Q4';
+
                                     // Subject Areas
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     const subjectAreas = entry['subject-area']?.map((s: any) => s['$']) || [];
@@ -109,19 +118,15 @@ export async function POST(req: NextRequest) {
                                     let matchScore = calculateJaccardSimilarity(keywordsArray, subjectAreas);
 
                                     // Apply Baseline Boost for International as well
-                                    // Check if Subject Areas contain the Field
                                     const isFieldInScope = subjectAreas.some((s: string) =>
                                         s.toLowerCase().includes(field.toLowerCase()) ||
                                         field.toLowerCase().includes(s.toLowerCase())
                                     );
 
                                     if (isFieldInScope) {
-                                        if (matchScore === 0) matchScore = 40; // Conservative baseline
+                                        if (matchScore === 0) matchScore = 40;
                                         else matchScore = Math.min(matchScore + 20, 100);
                                     }
-
-                                    // Filter out purely irrelevant (0 score and no field match)
-                                    // if (matchScore === 0 && !isFieldInScope) continue; 
 
                                     // Journal Link
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -130,17 +135,18 @@ export async function POST(req: NextRequest) {
 
                                     internationalJournals.push({
                                         name: entry['dc:title'],
-                                        rank: `CiteScore: ${citeScore}`,
+                                        rank: `${quartile} • CiteScore: ${citeScore}`, // Include Q in rank for filter to catch
                                         issn: issn,
                                         publisher: entry['dc:publisher'] || 'Unknown',
-                                        broad_field: field, // Use analyzed field
+                                        broad_field: field,
                                         specific_focus: subjectAreas,
                                         avg_processing_time: 'Varies',
                                         url: url,
                                         source: 'Scopus',
                                         matchScore: matchScore,
                                         citeScore: citeScore,
-                                        sjr: sjr
+                                        sjr: sjr,
+                                        quartile: quartile
                                     });
                                 }
                             }
