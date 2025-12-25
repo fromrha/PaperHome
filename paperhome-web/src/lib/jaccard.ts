@@ -1,25 +1,52 @@
+// Sophisticated Match Score
 export function calculateJaccardSimilarity(targetKeywords: string[], journalScope: string[]): number {
-    // Normalize logic
-    const normalize = (str: string) => str.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+    // 1. Better Normalization: kept minimal space but lowercased
+    const normalize = (str: string) => str.toLowerCase().trim().replace(/[^a-z0-9 ]/g, ''); // Keep spaces for multi-word comparison
 
-    const targetSet = new Set(targetKeywords.map(normalize));
-    const scopeSet = new Set(journalScope.map(normalize));
+    const targetSet = targetKeywords.map(normalize).filter(s => s.length > 2); // Filter tiny stopwords
+    const scopeSet = journalScope.map(normalize);
 
-    // Handle empty cases to avoid division by zero
-    if (targetSet.size === 0 || scopeSet.size === 0) return 0;
+    if (targetSet.length === 0 || scopeSet.length === 0) return 0;
 
-    // Intersection
-    let intersection = 0;
-    targetSet.forEach(item => {
-        if (scopeSet.has(item)) intersection++;
+    // 2. Soft Intersection (Partial Semantic Match)
+    let intersectionScore = 0;
+
+    // We check every target keyword against every scope keyword
+    // If there is a "good enough" substring match, we count it.
+    targetSet.forEach(target => {
+        let bestMatch = 0;
+        scopeSet.forEach(scope => {
+            // Exact Match
+            if (scope === target) {
+                bestMatch = 1;
+            }
+            // Partial Match (e.g. "communication" vs "communication studies")
+            else if (scope.includes(target) || target.includes(scope)) {
+                bestMatch = Math.max(bestMatch, 0.75); // Partial penalty
+            }
+            // Very loose partial (word overlap)
+            else {
+                const targetWords = target.split(' ');
+                const scopeWords = scope.split(' ');
+                const wordOverlap = targetWords.filter(tw => scopeWords.some(sw => sw.includes(tw) || tw.includes(sw))).length;
+                if (wordOverlap > 0) {
+                    bestMatch = Math.max(bestMatch, 0.3); // Loose word match
+                }
+            }
+        });
+        intersectionScore += bestMatch;
     });
 
-    // Union
-    const union = new Set([...targetSet, ...scopeSet]).size;
+    // 3. Union (Weighted)
+    // Conceptually union is roughly (Set A size + Set B size) - Intersection
+    // But since we use soft scores, let's simplify to: Score = Intersection / Max(TargetSize, ScopeSize)
+    // This rewards "Precision" more than "Recall" or Jaccard
+    // Or standard Dice-like: 2 * Intersection / (Size A + Size B)
 
-    // Calculate score (0 to 1)
-    const score = intersection / union;
+    const unionSize = targetSet.length + scopeSet.length;
+    const similarity = (2 * intersectionScore) / unionSize;
 
-    // Return percentage rounded to integer
-    return Math.round(score * 100);
+    // Boost factor for high quality exact matches?
+    // Let's optimize to return a 0-100 percentage
+    return Math.round(Math.min(similarity * 120, 100)); // 1.2x boost to make "good" matches look great (90%+)
 }

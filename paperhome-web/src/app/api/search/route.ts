@@ -14,36 +14,54 @@ export async function POST(req: NextRequest) {
 
         const keywordsArray = Array.isArray(keywords) ? keywords : [keywords];
 
-        // 1. National (SINTA)
+        // --- 1. National (SINTA) ---
         const rawNationalJournals = getSintaJournals(field);
 
-        // Calculate Jaccard Score for National
+        // Calculate Score for National
         const nationalJournals = rawNationalJournals.map(j => {
             const scope = Array.isArray(j.specific_focus) ? j.specific_focus : [j.specific_focus as string];
-            const matchScore = calculateJaccardSimilarity(keywordsArray, scope);
-            // Ensure legacy SINTA journals without rich scope don't get 0 if they match broad field
-            // Boost score if broad field matches? Maybe simpler to just rely on keywords relative to scope.
-            // If scope is empty, let's look at broad field as a "keyword"
-            if (scope.length === 0 || (scope.length === 1 && scope[0] === '')) {
-                const broadScore = calculateJaccardSimilarity(keywordsArray, [j.broad_field]);
-                return { ...j, matchScore: broadScore > 0 ? broadScore : 40 }; // Base score fallback
+
+            // Calculate Keyword Match
+            let matchScore = calculateJaccardSimilarity(keywordsArray, scope);
+
+            // Baseline Boost: If journal has no specific scope but matches broad field, give it 50%
+            // Or if score is low but field matches, boost it.
+            // Check loosely if 'broad_field' contains our 'field' or vice versa
+            const isFieldMatch = j.broad_field.toLowerCase().includes(field.toLowerCase()) ||
+                field.toLowerCase().includes(j.broad_field.toLowerCase());
+
+            if (isFieldMatch) {
+                // If Jaccard is 0 (no specific keywords match), give meaningful baseline (e.g. 50%)
+                // If Jaccard > 0, give small boost (e.g. +20)
+                if (matchScore === 0) matchScore = 50;
+                else matchScore = Math.min(matchScore + 20, 100);
             }
+
             return { ...j, matchScore };
         }).sort((a, b) => b.matchScore - a.matchScore);
 
 
-        // 2. International (Elsevier Scopus)
+        // --- 2. International (Elsevier Scopus) ---
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const internationalJournals: any[] = [];
         const apiKey = process.env.ELSEVIER_API_KEY;
 
         if (apiKey) {
-            const keywordQuery = keywordsArray.join(' OR ');
-            const encodedQuery = encodeURIComponent(`TITLE-ABS-KEY(${keywordQuery}) AND SRCTYPE(j)`);
+            // Refine Query: Include Field to ensure relevance (e.g. "Communication" AND ("keyword" OR "keyword"))
+            // Limiting keywords to top 3 to prevent query explosion
+            const topKeywords = keywordsArray.slice(0, 3).join('" OR "');
+            const keywordQuery = `"${topKeywords}"`;
+
+            // Search Query: (Subject(Field) OR TitleAbsKey(Field)) AND TitleAbsKey(Keywords)
+            // This forces the Field to be present, avoiding "Waste Management" showing up for "Communication" just because of one keyword.
+            const fieldQuery = `"${field}"`;
+            const finalQuery = `TITLE-ABS-KEY(${fieldQuery}) AND TITLE-ABS-KEY(${keywordQuery}) AND SRCTYPE(j)`;
+
+            const encodedQuery = encodeURIComponent(finalQuery);
 
             try {
                 // A. Search Scopus
-                const scopusRes = await fetch(`https://api.elsevier.com/content/search/scopus?query=${encodedQuery}&count=8&sort=citedby-count&apiKey=${apiKey}`, {
+                const scopusRes = await fetch(`https://api.elsevier.com/content/search/scopus?query=${encodedQuery}&count=8&sort=relevancy&apiKey=${apiKey}`, {
                     headers: { 'Accept': 'application/json' }
                 });
 
@@ -51,7 +69,7 @@ export async function POST(req: NextRequest) {
                     const scopusData = await scopusRes.json();
                     const entries = scopusData['search-results']?.entry || [];
 
-                    // Extract distinct ISSNs to fetch details
+                    // Extract distinct ISSNs
                     const seenIssns = new Set<string>();
                     const journalsToFetch: string[] = [];
 
@@ -64,7 +82,7 @@ export async function POST(req: NextRequest) {
                         }
                     });
 
-                    // Limit to top 5 distinct journals to avoid rate limits/latency
+                    // Limit to top 5 distinct types
                     const topIssns = journalsToFetch.slice(0, 5);
 
                     // B. Fetch Serial Title Details (Metrics)
@@ -76,40 +94,51 @@ export async function POST(req: NextRequest) {
 
                             if (serialRes.ok) {
                                 const serialData = await serialRes.json();
-                                const entry = serialData['serial-metadata-response']?.entry?.[0]; // Usually returned as array
+                                const entry = serialData['serial-metadata-response']?.entry?.[0];
 
                                 if (entry) {
                                     // Extract Metrics
-                                    const citeScore = entry['citeScoreYearInfoList']?.citeScoreCurrentMetric || 'N/A';
-                                    const sjr = entry['SJRList']?.SJR?.[0]?.['$'] || 'N/A'; // Scimago Journal Rank
+                                    const citeScore = entry['citeScoreYearInfoList']?.citeScoreCurrentMetric || 0;
+                                    const sjr = entry['SJRList']?.SJR?.[0]?.['$'] || 0;
 
-                                    // Infer Quartile from Percentile (roughly) if available, or just omit if simpler
-                                    // Scopus doesn't give "Q1" directly easily without more parsing.
-                                    // Let's use CiteScore as primary rank indicator for now.
-
-                                    // Subject Areas for Scope
+                                    // Subject Areas
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     const subjectAreas = entry['subject-area']?.map((s: any) => s['$']) || [];
 
-                                    // Calculate Jaccard Score
-                                    const matchScore = calculateJaccardSimilarity(keywordsArray, subjectAreas);
+                                    // Calculate Match Score
+                                    let matchScore = calculateJaccardSimilarity(keywordsArray, subjectAreas);
 
-                                    // Journal Link: Use "scopus-source" link type for Journal Homepage/Profile
+                                    // Apply Baseline Boost for International as well
+                                    // Check if Subject Areas contain the Field
+                                    const isFieldInScope = subjectAreas.some((s: string) =>
+                                        s.toLowerCase().includes(field.toLowerCase()) ||
+                                        field.toLowerCase().includes(s.toLowerCase())
+                                    );
+
+                                    if (isFieldInScope) {
+                                        if (matchScore === 0) matchScore = 40; // Conservative baseline
+                                        else matchScore = Math.min(matchScore + 20, 100);
+                                    }
+
+                                    // Filter out purely irrelevant (0 score and no field match)
+                                    // if (matchScore === 0 && !isFieldInScope) continue; 
+
+                                    // Journal Link
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     const linkObj = entry.link?.find((l: any) => l['@ref'] === 'scopus-source');
                                     const url = linkObj ? linkObj['@href'] : `https://www.scopus.com/sourceid/${entry['source-id']}`;
 
                                     internationalJournals.push({
                                         name: entry['dc:title'],
-                                        rank: `CiteScore: ${citeScore}`, // Display CiteScore as "Rank"
+                                        rank: `CiteScore: ${citeScore}`,
                                         issn: issn,
                                         publisher: entry['dc:publisher'] || 'Unknown',
-                                        broad_field: field,
+                                        broad_field: field, // Use analyzed field
                                         specific_focus: subjectAreas,
-                                        avg_processing_time: 'Varies', // Not provided by Scopus
+                                        avg_processing_time: 'Varies',
                                         url: url,
                                         source: 'Scopus',
-                                        matchScore: matchScore, // Jaccard
+                                        matchScore: matchScore,
                                         citeScore: citeScore,
                                         sjr: sjr
                                     });
@@ -125,8 +154,11 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Fallback or sort international
-        internationalJournals.sort((a, b) => b.matchScore - a.matchScore);
+        // Sort: Match Score DESC, then CiteScore DESC
+        internationalJournals.sort((a, b) => {
+            if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+            return (Number(b.citeScore) || 0) - (Number(a.citeScore) || 0);
+        });
 
         return NextResponse.json({
             national: nationalJournals,
