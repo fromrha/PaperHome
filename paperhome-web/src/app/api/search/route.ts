@@ -56,20 +56,26 @@ export async function POST(req: NextRequest) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const internationalJournals: any[] = [];
         const apiKey = process.env.ELSEVIER_API_KEY;
+        let finalQuery = ''; // Lifted scope for logging
 
         if (apiKey) {
             // QUERY Strategy:
-            // Use Primary Keywords for the SEARCH query to keep results relevant.
-            // Using "suggested/broad" keywords in the query might return too much noise.
-            // But we use "broad_field" as a filter if possible, or just the specific field.
+            // 1. Primary Keywords (Specific)
+            // 2. Suggested Keywords (Broader) - Use slice to keep query length manageable
+            const searchTerms = [...primaryKeywords, ...(secondaryKeywords.slice(0, 3))];
 
-            const topKeywords = primaryKeywords.slice(0, 3).join('" OR "');
-            const keywordQuery = `"${topKeywords}"`;
+            // Join with OR to broaden the net. If matches ANY keyword, it's a candidate.
+            const keywordsString = searchTerms.map(k => `"${k}"`).join(' OR ');
 
-            // Search Query: (Subject(Field) OR TitleAbsKey(Field)) AND TitleAbsKey(Keywords)
-            // We use the specific 'field' for the query to ensure we get "Islamic Education" journals if that's the topic.
-            const fieldQuery = `"${field}"`;
-            const finalQuery = `TITLE-ABS-KEY(${fieldQuery}) AND TITLE-ABS-KEY(${keywordQuery}) AND SRCTYPE(j)`;
+            // Field Query: Specific OR Broad
+            // Ensure we catch journals that might be categorized generally or specifically
+            let fieldQuery = `"${field}"`;
+            if (broad_field) {
+                fieldQuery += ` OR "${broad_field}"`;
+            }
+
+            // Final Query: (Title/Abs/Key(Fields) AND Title/Abs/Key(Keywords)) AND SourceType(Journal)
+            finalQuery = `TITLE-ABS-KEY(${fieldQuery}) AND TITLE-ABS-KEY(${keywordsString}) AND SRCTYPE(j)`;
 
             const encodedQuery = encodeURIComponent(finalQuery);
 
@@ -178,6 +184,10 @@ export async function POST(req: NextRequest) {
             } catch (e) {
                 console.error("Elsevier Scopus search failed:", e);
             }
+        }
+
+        if (internationalJournals.length === 0 && apiKey) {
+            console.warn("International Search returned 0 results. Query was:", finalQuery || "No Query");
         }
 
         // Sort: Match Score DESC, then CiteScore DESC
