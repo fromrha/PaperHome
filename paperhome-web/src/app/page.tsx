@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Upload, FileText, Search, Globe, MapPin, ExternalLink, Loader2, Sparkles } from 'lucide-react';
 
+// Cleaned up type definitions
 type Journal = {
   name: string;
   rank: string;
@@ -13,6 +14,10 @@ type Journal = {
   avg_processing_time: string;
   url: string;
   source?: string;
+  // New Metrics
+  matchScore?: number;
+  citeScore?: number | string;
+  sjr?: number | string;
 };
 
 type AnalysisResult = {
@@ -139,8 +144,8 @@ export default function Home() {
     const progressTimer = setInterval(() => {
       setAnalysisStep((prev) => {
         if (prev === "Reading file content...") return "Extracting text structure...";
-        if (prev === "Extracting text structure...") return "Sending to Gemini AI...";
-        if (prev === "Sending to Gemini AI...") return "Analyzing research field...";
+        if (prev === "Extracting text structure...") return "Sending to Nyth...";
+        if (prev === "Sending to Nyth...") return "Analyzing research field...";
         if (prev === "Analyzing research field...") return "Generating keywords...";
         return prev;
       });
@@ -200,7 +205,7 @@ export default function Home() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <header className="space-y-2 mb-8">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-800">
+        <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-800">
           Find the Perfect Journal
         </h2>
         <p className="text-slate-500 text-lg">
@@ -447,8 +452,8 @@ export default function Home() {
               ) : (
                 <>
                   {filteredList.slice(0, visibleCount).map((journal, idx) => {
-                    // Simulated Match Score Logic: Top result 98%, decreases slightly
-                    const matchScore = Math.max(65, 98 - (idx * 2)); // Minimum 65%
+                    // Use backend matchScore (default to 75 if missing, for fallback safety)
+                    const matchScore = journal.matchScore ?? 75;
 
                     // Color Logic
                     let strokeColor = '#64748b'; // Slate (default)
@@ -464,7 +469,7 @@ export default function Home() {
                       <div
                         key={idx}
                         onClick={() => setSelectedJournal(journal)}
-                        className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex items-start gap-6 cursor-pointer group"
+                        className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start gap-6 cursor-pointer group"
                       >
                         {/* Circular Match Score */}
                         <div className="relative shrink-0 flex items-center justify-center -ml-2">
@@ -506,9 +511,9 @@ export default function Home() {
                                 <h4 className="text-xl font-bold text-slate-800 break-words leading-tight" title={journal.name}>
                                   {journal.name}
                                 </h4>
-                                {/* Rank Badge Resituated Here */}
+                                {/* Rank Badge */}
                                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide shrink-0 ${journal.rank.includes('SINTA 1') || journal.rank.includes('SINTA 2') ? 'bg-green-100 text-green-700' :
-                                  journal.rank.includes('Scopus') || journal.rank.includes('SCIE') || journal.rank.includes('SSCI') ? 'bg-purple-100 text-purple-700' :
+                                  journal.rank.includes('Scopus') || journal.rank.includes('CiteScore') ? 'bg-purple-100 text-purple-700' :
                                     'bg-slate-100 text-slate-600'
                                   }`}>
                                   {journal.rank}
@@ -528,6 +533,27 @@ export default function Home() {
                                     ⏱️ {journal.avg_processing_time || 'Unknown'}
                                   </span>
                                 </div>
+                                {/* Metrics Display (International Only usually) */}
+                                {(journal.citeScore || journal.sjr) && (
+                                  <>
+                                    {journal.citeScore && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
+                                        <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100" title="CiteScore">
+                                          CS: {journal.citeScore}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {journal.sjr && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-1 h-1 bg-slate-300 rounded-full shrink-0"></span>
+                                        <span className="text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100" title="SJR (Scimago Journal Rank)">
+                                          SJR: {journal.sjr}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -544,13 +570,13 @@ export default function Home() {
                         </div>
 
                         {/* Visit Button */}
-                        <div className="self-center pl-4 border-l border-slate-100 flex flex-col items-center gap-2">
+                        <div className="self-center w-full sm:w-auto pl-0 sm:pl-4 border-l-0 sm:border-l border-slate-100 flex flex-col items-center gap-2 mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               window.open(journal.url, '_blank', 'noopener,noreferrer');
                             }}
-                            className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl transition-colors text-sm font-semibold whitespace-nowrap shadow-md shadow-blue-200"
+                            className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl transition-colors text-sm font-semibold whitespace-nowrap shadow-md shadow-blue-200"
                           >
                             Visit Website
                           </button>
