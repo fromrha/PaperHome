@@ -19,13 +19,12 @@ export default function Sidebar() {
     return (
         <>
             <aside className="w-64 bg-white border-r border-slate-200 h-full flex flex-col shadow-sm z-10">
-                <div className="p-6 border-b border-slate-100 flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
-                        P
-                    </div>
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">
-                        PaperHome
-                    </h1>
+                <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+                    <img
+                        src="/logomark.png"
+                        alt="PaperHome Logo"
+                        className="h-8 w-auto object-contain"
+                    />
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
                     <Link href="/" className="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl font-medium transition-all shadow-sm">

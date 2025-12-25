@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "PaperHome | Journal Finder",
   description: "Find the best journal for your research paper.",
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
